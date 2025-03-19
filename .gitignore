@@ -1,0 +1,5 @@
+# バックアップしておくが無視するファイル
+role_manager.ts.bak
+deps.ts.bak
+mcp-roles
+
