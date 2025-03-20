@@ -24,12 +24,12 @@ async function generateEmbeddedRoles() {
  * ビルド時にロールファイルの内容を直接コードに組み込む
  */
 
-export interface EmbeddedRole {
+export interface Role {
   id: string;
   content: string;
 }
 
-export const embeddedRoles: EmbeddedRole[] = ${JSON.stringify(roles, null, 2)};
+export const roles: Role[] = ${JSON.stringify(roles, null, 2)};
 `;
 
   await Deno.writeTextFile(OUTPUT_FILE, output);

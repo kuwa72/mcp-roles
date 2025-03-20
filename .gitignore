@@ -4,3 +4,7 @@ deps.ts.bak
 mcp-roles
 
 .windsurfrules
+
+# githubのTypeScriptのテンプレートで無視されるファイル
+DS_Store
+mcp-roles.exe

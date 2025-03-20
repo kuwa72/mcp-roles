@@ -9,9 +9,9 @@
     "zod": "npm:zod"
   },
   "tasks": {
-    "start": "deno run --allow-env main.ts",
-    "compile": "deno compile --allow-env main.ts -o mcp-roles",
+    "start": "deno run --allow-env --allow-read --allow-write main.ts",
+    "compile": "deno compile --allow-env --allow-read --allow-write main.ts -o mcp-roles",
     "generate": "deno run --allow-read --allow-write scripts/generate_embedded_roles.ts",
-    "build": "deno task generate && deno compile --allow-env --target x86_64-unknown-linux-gnu main.ts -o mcp-roles-linux && deno compile --allow-env --target x86_64-apple-darwin main.ts -o mcp-roles-macos && deno compile --allow-env --target x86_64-pc-windows-msvc main.ts -o mcp-roles-windows.exe"
+    "build": "deno task generate && deno compile --allow-env --allow-read --allow-write --target x86_64-unknown-linux-gnu main.ts -o mcp-roles-linux && deno compile --allow-env --allow-read --allow-write --target x86_64-apple-darwin main.ts -o mcp-roles-macos && deno compile --allow-env --allow-read --allow-write --target x86_64-pc-windows-msvc main.ts -o mcp-roles-windows.exe"
   }
 }

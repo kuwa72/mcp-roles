@@ -3,7 +3,6 @@
   "specifiers": {
     "jsr:@std/fs@^1.0.14": "1.0.14",
     "jsr:@std/path@^1.0.8": "1.0.8",
-    "npm:@modelcontextprotocol/sdk@*": "1.7.0_express@5.0.1_zod@3.24.2",
     "npm:@modelcontextprotocol/sdk@^1.7.0": "1.7.0_express@5.0.1_zod@3.24.2",
     "npm:@types/node@*": "22.12.0",
     "npm:fs@*": "0.0.1-security",
@@ -313,8 +312,8 @@
     "mime-db@1.52.0": {
       "integrity": "sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg=="
     },
-    "mime-db@1.53.0": {
-      "integrity": "sha512-oHlN/w+3MQ3rba9rqFr6V/ypF10LSkdwUysQL7GkXoTgIWeV+tcXGA852TBxH+gsh8UWoyhR1hKcoMJTuWflpg=="
+    "mime-db@1.54.0": {
+      "integrity": "sha512-aU5EJuIN2WDemCcAp2vFBfp/m4EAhWJnUNSSw0ixs7/kXbd6Pg64EmwJkNdFhB8aWt1sH2CTXrLxo/iAGV3oPQ=="
     },
     "mime-types@2.1.35": {
       "integrity": "sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==",
@@ -325,7 +324,7 @@
     "mime-types@3.0.0": {
       "integrity": "sha512-XqoSHeCGjVClAmoGFG3lVFqQFRIrTVw2OH3axRqAcfaw+gHWIfnASS92AV+Rl/mk0MupgZTRHQOjxY6YVnzK5w==",
       "dependencies": [
-        "mime-db@1.53.0"
+        "mime-db@1.54.0"
       ]
     },
     "ms@2.1.2": {
@@ -519,8 +518,8 @@
     "wrappy@1.0.2": {
       "integrity": "sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ=="
     },
-    "zod-to-json-schema@3.24.3_zod@3.24.2": {
-      "integrity": "sha512-HIAfWdYIt1sssHfYZFCXp4rU1w2r8hVVXYIlmoa0r0gABLs5di3RCqPU5DDROogVz1pAdYBaz7HK5n9pSUNs3A==",
+    "zod-to-json-schema@3.24.4_zod@3.24.2": {
+      "integrity": "sha512-0uNlcvgabyrni9Ag8Vghj21drk7+7tp7VTwwR7KxxXXc/3pbXz2PHlDgj3cICahgF1kHm4dExBFj7BXrZJXzig==",
       "dependencies": [
         "zod"
       ]
@@ -878,7 +877,6 @@
     "dependencies": [
       "jsr:@std/fs@^1.0.14",
       "jsr:@std/path@^1.0.8",
-      "npm:@modelcontextprotocol/sdk@*",
       "npm:@modelcontextprotocol/sdk@^1.7.0",
       "npm:zod@*"
     ]
