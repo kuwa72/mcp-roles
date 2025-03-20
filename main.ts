@@ -1,15 +1,14 @@
-#!/usr/bin/env deno run --allow-read --allow-env
+#!/usr/bin/env deno run --allow-env
 
 /**
- * Model Context Protocol (MCP)規格に準拠したロール提供サーバー - 単一ファイル版
+ * Model Context Protocol (MCP)規格に準拠したロール提供サーバー - 埋め込みロール版
  * このサーバーは、事前に定義したロール（役割）をLLMに提供します
  */
 
-import { McpServer } from "npm:@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "npm:@modelcontextprotocol/sdk/server/stdio.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
 import { z } from "npm:zod";
-import { join, basename } from "https://deno.land/std/path/mod.ts";
-import { exists } from "https://deno.land/std/fs/mod.ts";
+import { embeddedRoles } from "./embedded_roles.ts";
 
 // コマンドライン引数の解析
 const args = Deno.args;
@@ -44,58 +43,23 @@ interface RoleList {
 }
 
 /**
- * ロールマネージャークラス
+ * 埋め込みロールマネージャークラス
  */
-class RoleManager {
-  rolesDir: string;
-
-  /**
-   * コンストラクタ
-   * @param rolesDir ロールファイルが格納されているディレクトリのパス
-   */
-  constructor(rolesDir: string) {
-    this.rolesDir = rolesDir;
-  }
-
+class EmbeddedRoleManager {
   /**
    * 利用可能なロール一覧を取得
    * @returns ロール一覧
    */
   async listRoles(): Promise<RoleList> {
-    const roles: RoleList["roles"] = [];
-
     try {
-      // ディレクトリが存在するか確認
-      if (!(await exists(this.rolesDir))) {
-        console.error(`rolesDir: ${this.rolesDir}`);
-        console.error(`pwd: ${Deno.cwd()}`);
-        throw new Error(`ロールディレクトリが存在しません: ${this.rolesDir}`);
-      }
-
-      // ディレクトリ内のMarkdownファイルを取得
-      for await (const entry of Deno.readDir(this.rolesDir)) {
-        if (entry.isFile && entry.name.endsWith(".md")) {
-          try {
-            // ファイルからロール情報を抽出
-            const roleId = entry.name.replace(/\.md$/, "");
-            const filePath = join(this.rolesDir, entry.name);
-            const content = await Deno.readTextFile(filePath);
-
-            // ロール名と説明を抽出
-            const { name, description } = this.extractRoleInfo(content);
-
-            roles.push({
-              id: roleId,
-              name,
-              description,
-            });
-          } catch (error) {
-            console.error(
-              `ロール情報の抽出に失敗しました (${entry.name}): ${error}`,
-            );
-          }
-        }
-      }
+      const roles = embeddedRoles.map((role) => {
+        const { name, description } = this.extractRoleInfo(role.content);
+        return {
+          id: role.id,
+          name,
+          description,
+        };
+      });
 
       return { roles };
     } catch (error) {
@@ -110,18 +74,12 @@ class RoleManager {
    */
   async getRole(roleId: string): Promise<Role | null> {
     try {
-      const filePath = join(this.rolesDir, `${roleId}.md`);
-
-      // ファイルが存在するか確認
-      if (!(await exists(filePath))) {
+      const role = embeddedRoles.find((r) => r.id === roleId);
+      if (!role) {
         return null;
       }
 
-      // ファイルの内容を読み込む
-      const content = await Deno.readTextFile(filePath);
-
-      // ロール情報を抽出
-      const { name, description, context } = this.extractRoleInfo(content);
+      const { name, description, context } = this.extractRoleInfo(role.content);
 
       return {
         id: roleId,
@@ -152,6 +110,9 @@ class RoleManager {
     for (const line of lines) {
       if (line.startsWith("# ")) {
         name = line.substring(2).trim();
+        if (name.startsWith("役割: ")) {
+          name = name.substring(4).trim();
+        }
         break;
       }
     }
@@ -197,30 +158,8 @@ class RoleManager {
   }
 }
 
-// ホームディレクトリのパスを取得
-const homeDir = Deno.env.get("HOME") || Deno.env.get("USERPROFILE") || "";
-if (!homeDir) {
-  log("error", "ホームディレクトリが見つかりません");
-  Deno.exit(1);
-}
-
-// デフォルトのロールディレクトリパス
-const defaultRolesDir = "./roles";
-// ユーザー設定のロールディレクトリパス
-const userRolesDir = join(homeDir, ".config", "mcp-roles", "roles");
-
 // ロールマネージャーのインスタンスを作成
-// ユーザー設定のディレクトリが存在する場合はそれを使用し、
-// 存在しない場合はデフォルトのディレクトリを使用
-let rolesDir = defaultRolesDir;
-if (await exists(userRolesDir)) {
-  rolesDir = userRolesDir;
-  log("info", `ユーザー設定のロールディレクトリを使用します: ${userRolesDir}`);
-} else {
-  log("info", `デフォルトのロールディレクトリを使用します: ${defaultRolesDir}`);
-}
-
-const roleManager = new RoleManager(rolesDir);
+const roleManager = new EmbeddedRoleManager();
 
 // ツール入力用のZodスキーマを定義
 const GetRoleSchema = z.object({
@@ -275,7 +214,9 @@ server.tool(
         content: [
           {
             type: "text",
-            text: `エラー: ${error instanceof Error ? error.message : String(error)}`,
+            text: `エラー: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
           },
         ],
         isError: true,
@@ -305,7 +246,9 @@ server.tool(
         content: [
           {
             type: "text",
-            text: `エラー: ${error instanceof Error ? error.message : String(error)}`,
+            text: `エラー: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
           },
         ],
         isError: true,
@@ -321,7 +264,7 @@ async function main() {
     await server.connect(transport);
     log(
       "info",
-      `ロール提供 MCP サーバーを起動しました (ロールディレクトリ: ${roleManager.rolesDir})`,
+      `ロール提供 MCP サーバーを起動しました (埋め込みロールバージョン)`,
     );
 
     // 利用可能なロールを表示
