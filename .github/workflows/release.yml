@@ -36,7 +36,7 @@ jobs:
           deno compile --allow-env --target ${{ matrix.target }} -o mcp-roles${{ matrix.binary_suffix }} main.ts
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mcp-roles-${{ matrix.target }}
           path: mcp-roles${{ matrix.binary_suffix }}
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
