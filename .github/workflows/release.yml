@@ -30,6 +30,9 @@ jobs:
 
       - name: Generate embedded roles
         run: deno task generate
+      
+      - name: Update dependencies
+        run: deno cache --reload --lock-write echo_mcp.ts
 
       - name: Build binary
         run: |
