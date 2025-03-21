@@ -31,10 +31,7 @@ jobs:
       - name: Generate embedded roles
         run: deno task generate
       
-      - name: Update dependencies
-        run: |
-          rm -f deno.lock
-          deno cache --reload main.ts
+
 
       - name: Build binary
         run: |
