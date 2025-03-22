@@ -10,8 +10,9 @@
   },
   "tasks": {
     "start": "deno run --allow-env --allow-read --allow-write main.ts",
-    "compile": "deno compile --allow-env --allow-read --allow-write main.ts -o mcp-roles",
+    "compile": "deno compile --allow-env --allow-read --allow-write main.ts -o main.ts",
     "generate": "deno run --allow-read --allow-write scripts/generate_embedded_roles.ts",
-    "build": "deno task generate && deno compile --allow-env --allow-read --allow-write --target x86_64-unknown-linux-gnu main.ts -o mcp-roles-linux && deno compile --allow-env --allow-read --allow-write --target x86_64-apple-darwin main.ts -o mcp-roles-macos && deno compile --allow-env --allow-read --allow-write --target x86_64-pc-windows-msvc main.ts -o mcp-roles-windows.exe"
+    "build:mac": "deno task generate && deno compile --allow-env --allow-read --allow-write --target x86_64-apple-darwin --output mcp-roles main.ts",
+    "build:win": "deno task generate && deno compile --allow-env --allow-read --allow-write --target x86_64-pc-windows-msvc --output mcp-roles.exe main.ts"
   }
 }

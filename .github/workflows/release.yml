@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   build:
@@ -11,50 +11,45 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-latest, windows-latest]
         include:
-          - os: macOS-latest
-            target: x86_64-apple-darwin
-            binary_suffix: ""
+          - os: macos-latest
+            build-task: build:mac
+            output: mcp-roles
           - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            binary_suffix: ".exe"
+            build-task: build:win
+            output: mcp-roles.exe
 
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
-      - name: Generate embedded roles
-        run: deno task generate
-      
-
-
       - name: Build binary
-        run: |
-          deno compile --allow-env --target ${{ matrix.target }} -o mcp-roles${{ matrix.binary_suffix }} main.ts
+        run: deno task ${{ matrix.build-task }}
 
-      - name: Upload artifacts
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mcp-roles-${{ matrix.target }}
-          path: mcp-roles${{ matrix.binary_suffix }}
+          name: ${{ matrix.output }}
+          path: ${{ matrix.output }}
 
-  release:
+  create-release:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
-            mcp-roles-x86_64-apple-darwin/mcp-roles
-            mcp-roles-x86_64-pc-windows-msvc/mcp-roles.exe
+            mcp-roles
+            mcp-roles.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
